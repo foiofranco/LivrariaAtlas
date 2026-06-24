@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Livraria Atlas | IHC Prototype (KLM/Kieras Optimized)</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Atlas Livraria | Excelência em IHC e Acessibilidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,454 +12,606 @@
                 extend: {
                     colors: {
                         atlas: {
-                            navy: '#0b132b',
-                            gold: '#d4af37',
-                            goldlight: '#f3e5ab',
-                            slate: '#1c2541'
+                            navy: '#0F172A',
+                            gold: '#D4AF37',
+                            slate: '#1E293B',
+                            light: '#F5F5F5'
                         }
                     }
                 }
             }
         }
     </script>
-    <!-- Lucide Icons para ícones minimalistas -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Estados de foco ultra-visíveis para conformidade estrita WCAG 2.2 AA */
+        *:focus-visible {
+            outline: 3px solid #D4AF37 !important;
+            outline-offset: 2px !important;
+        }
+        /* Transições suaves de interface */
+        .view-transition {
+            transition: opacity 0.2s ease-in-out;
+        }
+        /* Customizações de acessibilidade */
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-slate-900 dark:bg-atlas-navy dark:text-gray-100 transition-colors duration-200 font-sans">
+<body class="bg-gray-50 text-slate-900 dark:bg-atlas-navy dark:text-gray-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-    <!-- IHC EVALUATOR PANEL (Apoio para testes KLM/Kieras) -->
-    <div class="bg-amber-500 text-slate-900 p-2 text-center text-xs font-mono font-bold flex justify-between items-center px-4 sticky top-0 z-50 shadow-md">
-        <span>[IHC MODELO KLM/KIERAS] Atalhos de teclado ativos para reduzir operador $H$ e $P$.</span>
-        <div class="space-x-2">
-            <button onclick="switchPage('home')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Home (F1)</button>
-            <button onclick="switchPage('categoria')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Catálogo (F2)</button>
-            <button onclick="switchPage('produto')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Produto (F3)</button>
-            <button onclick="switchPage('carrinho')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Carrinho (F4)</button>
-            <button onclick="switchPage('checkout')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Checkout (F5)</button>
-            <button onclick="switchPage('cliente')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Área Cliente (F6)</button>
+    <a href="#main-content" class="skip-link absolute top-0 left-0 bg-atlas-gold text-atlas-navy px-4 py-2 font-bold z-50 -translate-y-full transition-transform duration-150" aria-label="Pular para o conteúdo principal">Ir para o conteúdo principal</a>
+
+    <div class="bg-atlas-gold text-atlas-navy p-2 text-xs font-mono font-bold flex justify-between items-center px-4 sticky top-0 z-50 shadow-md border-b border-amber-500">
+        <span class="hidden md:inline">[SISTEMA IHC ATLAS] Use F1-F4 ou / para mitigar os operadores cognitivos M e P do KLM.</span>
+        <div class="flex gap-1.5 overflow-x-auto">
+            <button onclick="switchView('home')" class="bg-atlas-navy text-white px-2 py-1 rounded hover:opacity-90 text-[10px] md:text-xs">Home (F1)</button>
+            <button onclick="switchView('catalogo')" class="bg-atlas-navy text-white px-2 py-1 rounded hover:opacity-90 text-[10px] md:text-xs">Catálogo (F2)</button>
+            <button onclick="switchView('contato')" class="bg-atlas-navy text-white px-2 py-1 rounded hover:opacity-90 text-[10px] md:text-xs">Contato (F3)</button>
+            <button onclick="toggleDarkMode()" class="bg-atlas-navy text-white p-1 rounded hover:opacity-90 flex items-center justify-center" aria-label="Alternar alto contraste / modo escuro"><i data-lucide="moon" class="w-3 h-3"></i></button>
         </div>
-        <button onclick="toggleDarkMode()" class="bg-slate-900 text-white p-1 rounded-full"><i data-lucide="moon" class="w-4 h-4"></i></button>
     </div>
 
-    <!-- GLOBAL NAVBAR -->
-    <header class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-atlas-slate/80 backdrop-blur sticky top-8 z-40">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-            <!-- Logo ATLAS -->
-            <a href="#" onclick="switchPage('home')" class="flex items-center gap-2 font-serif text-2xl font-bold tracking-wider text-atlas-navy dark:text-white">
-                <i data-lucide="compass" class="text-amber-500 w-7 h-7"></i>
-                ATLAS
+    <header class="bg-white dark:bg-atlas-slate shadow-sm sticky top-9 z-40 border-b border-gray-200 dark:border-gray-800 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+            <a href="#" onclick="switchView('home'); return false;" class="flex items-center gap-3 group" aria-label="Atlas Livraria - Voltar para Home">
+                <div class="w-12 h-12 bg-atlas-navy dark:bg-slate-900 rounded-xl flex items-center justify-center border-2 border-atlas-gold shadow-md">
+                    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#D4AF37" stroke-width="5" fill="#0F172A"/>
+                        <path d="M25 65C35 55 45 55 50 60C55 55 65 55 75 65V35C65 25 55 25 50 30C45 25 35 25 25 35V65Z" fill="#FFFFFF" stroke="#D4AF37" stroke-width="3"/>
+                        <line x1="50" y1="30" x2="50" y2="60" stroke="#D4AF37" stroke-width="4"/>
+                        <path d="M50 15C65 30 65 70 50 85" stroke="rgba(212,175,55,0.4)" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="block font-serif text-xl font-black tracking-wider text-atlas-navy dark:text-white">ATLAS</span>
+                    <span class="block text-[10px] tracking-widest uppercase font-bold text-atlas-gold">LIVRARIA</span>
+                </div>
             </a>
 
-            <!-- BUSCA AVANÇADA (KLM OTIMIZADA: Foco automático com '/' ou clique único) -->
-            <div class="flex-1 max-w-xl relative">
-                <input id="global-search" type="text" placeholder="Buscar por título, autor, ISBN... (Pressione '/' para focar)" 
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
-                <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-400 w-5 h-5"></i>
+            <div class="flex-1 max-w-xl relative hidden sm:block">
+                <input id="search-bar" type="text" placeholder="Buscar por título, autor ou gênero... (Pressione '/' para focar)" 
+                    class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-atlas-gold text-sm transition-all"
+                    aria-label="Caixa de busca de acervo rápida">
+                <i data-lucide="search" class="absolute left-3 top-3 text-gray-400 w-4 h-4"></i>
             </div>
 
-            <!-- NAVEGAÇÃO RÁPIDA -->
-            <nav class="flex items-center gap-6">
-                <button onclick="switchPage('categoria')" class="hover:text-amber-500 flex items-center gap-1 font-medium"><i data-lucide="book-open" class="w-4 h-4"></i> Categorias</button>
-                <button onclick="switchPage('cliente')" class="hover:text-amber-500 flex items-center gap-1 font-medium"><i data-lucide="user" class="w-4 h-4"></i> Conta</button>
-                <button onclick="switchPage('carrinho')" class="relative hover:text-amber-500 font-medium flex items-center gap-1">
-                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                    <span id="cart-count" class="absolute -top-2 -right-3 bg-amber-500 text-slate-900 text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+            <nav class="flex items-center gap-4 md:gap-6 font-medium text-sm">
+                <button onclick="switchView('home')" id="nav-home" class="hover:text-atlas-gold text-atlas-navy dark:text-white flex items-center gap-1.5 transition-colors"><i data-lucide="home" class="w-4 h-4"></i> <span class="hidden md:inline">Home</span></button>
+                <button onclick="switchView('catalogo')" id="nav-catalogo" class="hover:text-atlas-gold text-atlas-navy dark:text-white flex items-center gap-1.5 transition-colors"><i data-lucide="book-open" class="w-4 h-4"></i> Catálogo</button>
+                <button onclick="switchView('contato')" id="nav-contato" class="hover:text-atlas-gold text-atlas-navy dark:text-white flex items-center gap-1.5 transition-colors"><i data-lucide="mail" class="w-4 h-4"></i> Contato</button>
+                
+                <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-atlas-gold hover:text-atlas-navy text-slate-700 dark:text-gray-200 transition-all shadow-sm" aria-label="Ver sacola de compras">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span id="global-cart-badge" class="absolute -top-1.5 -right-1.5 bg-atlas-gold text-atlas-navy font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-atlas-slate animate-bounce">0</span>
                 </button>
             </nav>
         </div>
     </header>
 
-    <!-- MAIN CONTENT VIEWPORT -->
-    <main class="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-12rem)]">
-
-        <!-- ================= HOME PAGE ================= -->
-        <section id="view-home" class="view-page space-y-16">
-            <!-- Hero Banner -->
-            <div class="bg-gradient-to-r from-atlas-navy to-atlas-slate rounded-2xl p-8 md:p-16 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl">
-                <div class="space-y-6 max-w-xl">
-                    <span class="text-amber-500 font-semibold tracking-widest uppercase text-sm">Lançamento Exclusivo</span>
-                    <h1 class="text-4xl md:text-5xl font-serif font-bold leading-tight">Explore os confins do conhecimento humano.</h1>
-                    <p class="text-gray-300 text-lg">"Arquitetura de Sistemas Antigos" — A obra definitiva para engenheiros e historiadores de tecnologia.</p>
-                    <button onclick="switchPage('produto')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition shadow-lg">
-                        Descobrir Obra <i data-lucide="arrow-right" class="w-5 h-5"></i>
+    <main id="main-content" class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 focus:outline-none" tabindex="-1">
+        
+        <section id="view-home" class="view-transition space-y-16">
+            <div class="bg-gradient-to-br from-atlas-navy to-atlas-slate rounded-3xl p-8 md:p-16 text-white flex flex-col lg:flex-row items-center justify-between gap-12 shadow-xl border border-gray-800 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+                <div class="space-y-6 max-w-2xl relative z-10">
+                    <span class="text-atlas-gold font-bold tracking-widest uppercase text-xs bg-amber-500/10 px-3 py-1 rounded-full border border-atlas-gold/20">Destaque Acadêmico</span>
+                    <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight">Conhecimento para mover mundos.</h1>
+                    <p class="text-gray-300 text-lg">A Atlas traz curadoria de alto nível universitário, literário e científico para mentes inquietas.</p>
+                    <button onclick="switchView('catalogo')" class="bg-atlas-gold hover:bg-yellow-500 text-atlas-navy font-black px-8 py-4 rounded-xl flex items-center gap-3 transition-all shadow-lg active:scale-95 text-base" aria-label="Explorar livros do catálogo completo">
+                        Explorar Livros <i data-lucide="compass" class="w-5 h-5"></i>
                     </button>
                 </div>
-                <div class="w-48 h-72 bg-amber-900/50 rounded-lg shadow-2xl border border-amber-500/30 flex items-center justify-center text-center p-4">
-                    <span class="font-serif italic text-amber-500">Capa do Livro em Destaque</span>
-                </div>
-            </div>
-
-            <!-- Categorias Principais -->
-            <div>
-                <h2 class="text-2xl font-serif font-bold mb-6 flex items-center gap-2"><i data-lucide="layout-grid" class="text-amber-500"></i> Categorias em Destaque</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="cpu" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Tecnologia</span>
-                    </div>
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="trending-up" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Negócios</span>
-                    </div>
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="sparkles" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Ficção e Fantasia</span>
-                    </div>
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="heart" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Romance</span>
-                    </div>
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="smile" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Desenv. Pessoal</span>
-                    </div>
-                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
-                        <i data-lucide="graduation-cap" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Universitários</span>
+                <div class="w-64 h-80 bg-slate-800 rounded-2xl shadow-2xl border-2 border-atlas-gold/30 flex flex-col justify-between p-6 relative group hover:border-atlas-gold transition-all duration-300 flex-shrink-0">
+                    <div class="w-full h-40 bg-atlas-navy rounded-lg flex items-center justify-center font-serif text-center font-bold text-atlas-gold text-xs border border-atlas-gold/20 p-2">Princípios de IHC Aplicados</div>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-atlas-gold">Mais Vendido</div>
+                        <div class="text-xs text-gray-400">John Kieras</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Grid de Mais Vendidos & Promoções -->
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Promoções da Semana -->
-                <div class="md:col-span-1 bg-amber-50 dark:bg-slate-900/40 p-6 rounded-2xl border border-amber-200 dark:border-amber-900/50">
-                    <h3 class="text-xl font-serif font-bold mb-4 flex items-center gap-2 text-amber-800 dark:text-amber-400"><i data-lucide="percent"></i> Ofertas Clássicas</h3>
-                    <div class="space-y-4">
-                        <div class="flex gap-4 items-center bg-white dark:bg-atlas-slate p-3 rounded-xl shadow-sm cursor-pointer" onclick="switchPage('produto')">
-                            <div class="w-12 h-16 bg-gray-200 dark:bg-gray-800 rounded flex-shrink-0"></div>
-                            <div>
-                                <h4 class="font-bold text-sm line-clamp-1">O Labirinto da Mente</h4>
-                                <p class="text-xs text-gray-500">R$ 29,90 <span class="line-through text-[10px]">R$ 59,90</span></p>
-                            </div>
-                        </div>
+            <div class="space-y-6">
+                <h2 class="text-2xl font-serif font-black text-atlas-navy dark:text-white flex items-center gap-2.5"><span class="w-2 h-6 bg-atlas-gold rounded-full"></span> Categorias Populares</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="filterByCategory('Tecnologia')" class="p-6 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-2xl text-center cursor-pointer hover:border-atlas-gold transition-all shadow-sm hover:shadow-md group">
+                        <i data-lucide="cpu" class="mx-auto mb-3 text-atlas-gold group-hover:scale-110 transition-transform"></i>
+                        <span class="block text-sm font-bold">Tecnologia & IHC</span>
                     </div>
-                </div>
-
-                <!-- Mais Vendidos (Grid de Produtos Principal) -->
-                <div class="md:col-span-2 space-y-6">
-                    <h3 class="text-xl font-serif font-bold flex items-center gap-2"><i data-lucide="zap" class="text-amber-500"></i> Mais Procurados na Atlas</h3>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <!-- Card Produto Exemplo -->
-                        <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-                            <div onclick="switchPage('produto')" class="cursor-pointer">
-                                <div class="w-full h-40 bg-gray-200 dark:bg-slate-800 rounded-lg mb-3 flex items-center justify-center text-gray-400"><i data-lucide="book" class="w-8 h-8"></i></div>
-                                <h4 class="font-bold font-serif line-clamp-1">Princípios de IHC Aplicados</h4>
-                                <p class="text-xs text-gray-500 mb-2">Por John Kieras</p>
-                                <div class="flex items-center gap-1 text-amber-500 text-xs mb-2">
-                                    <i data-lucide="star" class="w-3 h-3 fill-current"></i> 4.9 <span class="text-gray-400 text-[10px]">(142 avaliações)</span>
-                                    <span class="ml-auto bg-green-100 text-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded">Fidelidade +10%</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                                <span class="font-bold text-amber-600 dark:text-amber-400">R$ 89,90</span>
-                                <button onclick="addToCart()" class="bg-atlas-navy dark:bg-amber-500 dark:text-slate-900 text-white p-2 rounded-lg hover:opacity-90 transition"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
+                    <div onclick="filterByCategory('Ficção')" class="p-6 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-2xl text-center cursor-pointer hover:border-atlas-gold transition-all shadow-sm hover:shadow-md group">
+                        <i data-lucide="sparkles" class="mx-auto mb-3 text-atlas-gold group-hover:scale-110 transition-transform"></i>
+                        <span class="block text-sm font-bold">Ficção Científica</span>
+                    </div>
+                    <div onclick="filterByCategory('História')" class="p-6 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-2xl text-center cursor-pointer hover:border-atlas-gold transition-all shadow-sm hover:shadow-md group">
+                        <i data-lucide="landmark" class="mx-auto mb-3 text-atlas-gold group-hover:scale-110 transition-transform"></i>
+                        <span class="block text-sm font-bold">História & Humanas</span>
+                    </div>
+                    <div onclick="filterByCategory('Filosofia')" class="p-6 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-2xl text-center cursor-pointer hover:border-atlas-gold transition-all shadow-sm hover:shadow-md group">
+                        <i data-lucide="scroll" class="mx-auto mb-3 text-atlas-gold group-hover:scale-110 transition-transform"></i>
+                        <span class="block text-sm font-bold">Filosofia Clássica</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Descubra sua Próxima Leitura / Sistema de Recomendação -->
-            <div class="bg-slate-100 dark:bg-slate-900 p-8 rounded-2xl text-center space-y-4 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-xl font-serif font-bold">Descubra sua Próxima Leitura Inteligente</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">Selecione seus interesses dominantes e nossa IA gerará uma trilha de conhecimento sob medida.</p>
-                <div class="flex justify-center gap-2 flex-wrap max-w-xl mx-auto">
-                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Sistemas Distribuídos</button>
-                    <button class="px-3 py-1.5 rounded-full border border-amber-500 text-xs bg-amber-500/10 text-amber-600 font-bold">Ficção Científica Hard</button>
-                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Alta Fantasia</button>
-                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Finanças Quantitativas</button>
-                </div>
+            <div class="space-y-6">
+                <h3 class="text-2xl font-serif font-black text-atlas-navy dark:text-white flex items-center gap-2.5"><span class="w-2 h-6 bg-atlas-gold rounded-full"></span> Destaques da Semana</h3>
+                <div id="home-highlights-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    </div>
             </div>
 
-            <!-- Newsletter & Depoimentos -->
-            <div class="grid md:grid-cols-2 gap-8 items-center border-t border-gray-200 dark:border-gray-800 pt-12">
+            <div class="bg-gray-100 dark:bg-atlas-slate p-8 md:p-12 rounded-3xl grid md:grid-cols-2 gap-8 items-center border border-gray-200 dark:border-gray-700">
                 <div class="space-y-4">
-                    <h3 class="text-xl font-serif font-bold">As Crônicas da Atlas</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Ensaios literários, curadorias profundas e avisos de edições raras direto no seu e-mail.</p>
-                    <div class="flex gap-2">
-                        <input type="email" placeholder="Seu melhor e-mail institucional ou pessoal" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900">
-                        <button class="bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-bold hover:bg-amber-600 text-sm">Inscrever-se</button>
-                    </div>
+                    <h4 class="text-xl font-serif font-bold text-atlas-navy dark:text-white">Excelência em Experiência Centrada no Usuário</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Nossa plataforma foi concebida sob os pilares da Interação Humano-Computador, garantindo navegação preditiva acelerada por teclado e acessibilidade integral para leitores de tela.</p>
                 </div>
-                <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                    <p class="italic text-sm text-gray-600 dark:text-gray-400">"A experiência de busca rápida por atalhos no teclado transformou a forma como monto minha bibliografia acadêmica. A Atlas respeita o tempo do usuário."</p>
-                    <div class="mt-4 flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center font-bold text-xs text-slate-900">A</div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm relative">
+                    <i data-lucide="quote" class="absolute right-4 top-4 text-atlas-gold/20 w-12 h-12"></i>
+                    <p class="italic text-sm text-gray-600 dark:text-gray-300">"A velocidade operacional para encontrar obras raras de engenharia na Atlas utilizando apenas os mapeamentos de teclado reduziu drasticamente nossa carga cognitiva estrutural."</p>
+                    <div class="mt-4 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-atlas-gold text-atlas-navy font-bold rounded-full flex items-center justify-center text-sm">PR</div>
                         <div>
-                            <h5 class="text-xs font-bold">Prof. Dr. Arthur Silva</h5>
-                            <p class="text-[10px] text-gray-400">Membro Premium Atlas (Nível 4)</p>
+                            <h5 class="text-xs font-bold">Prof. Ricardo M. de Oliveira</h5>
+                            <p class="text-[10px] text-gray-400">Coordenador de IHC Aplicada</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= PÁGINA DE CATEGORIA / CATÁLOGO ================= -->
-        <section id="view-categoria" class="view-page hidden grid md:grid-cols-4 gap-8">
-            <!-- Filtros (Lateral) -->
-            <aside class="space-y-6">
+        <section id="view-catalogo" class="view-transition hidden space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
                 <div>
-                    <h3 class="font-serif font-bold text-lg border-b pb-2 mb-4">Filtrar Acervo</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Gênero</label>
-                            <div class="space-y-1 text-sm">
-                                <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-amber-500"> Tecnologia (42)</label>
-                                <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-amber-500"> Filosofia (18)</label>
-                                <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-amber-500"> Finanças (23)</label>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Faixa de Preço</label>
-                            <input type="range" class="w-full accent-amber-500" min="0" max="300" value="150">
-                            <div class="flex justify-between text-xs text-gray-400 mt-1"><span>R$ 0</span><span>R$ 300</span></div>
-                        </div>
-                    </div>
+                    <h2 class="text-3xl font-serif font-black text-atlas-navy dark:text-white">Acervo Geral Atlas</h2>
+                    <p class="text-xs text-gray-500 mt-1">Filtragem síncrona instantânea de acervo em menos de 2 segundos.</p>
                 </div>
-            </aside>
-
-            <!-- Grid de Produtos e Ordenação -->
-            <main class="md:col-span-3 space-y-6">
-                <div class="flex justify-between items-center bg-white dark:bg-atlas-slate p-3 rounded-xl border border-gray-200 dark:border-gray-800 text-sm">
-                    <span>Exibindo <strong>12</strong> de 42 livros em <strong>Tecnologia</strong></span>
-                    <select class="bg-transparent border-none outline-none font-medium focus:ring-0 cursor-pointer">
-                        <option>Ordenar por: Relevância</option>
-                        <option>Menor Preço</option>
-                        <option>Maior Preço</option>
-                        <option>Mais Populares</option>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="sort-select" class="sr-only">Ordenar acervo por</label>
+                    <select id="sort-select" onchange="applyFilters()" class="w-full md:w-56 bg-white dark:bg-atlas-slate border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-atlas-gold">
+                        <option value="relevancia">Relevância</option>
+                        <option value="menor-preco">Menor Preço</option>
+                        <option value="maior-preco">Maior Preço</option>
+                        <option value="mais-vendidos">Mais Vendidos</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="grid sm:grid-cols-3 gap-4">
-                    <!-- Produto 1 -->
-                    <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
-                        <div onclick="switchPage('produto')" class="cursor-pointer">
-                            <div class="w-full h-44 bg-gray-200 dark:bg-slate-800 rounded-lg mb-3 flex items-center justify-center text-gray-400"><i data-lucide="book" class="w-8 h-8"></i></div>
-                            <h4 class="font-bold font-serif line-clamp-1">Design Systems Escaláveis</h4>
-                            <p class="text-xs text-gray-500">Clara Jenkins</p>
-                        </div>
-                        <div class="flex items-center justify-between mt-4">
-                            <span class="font-bold text-amber-600 dark:text-amber-400">R$ 112,00</span>
-                            <button onclick="addToCart()" class="bg-atlas-navy dark:bg-amber-500 dark:text-slate-900 text-white p-2 rounded-lg"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
+                <aside class="bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 p-6 rounded-2xl space-y-6 shadow-sm">
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Categoria / Gênero</h4>
+                        <div class="space-y-2 text-sm" id="category-filter-group">
+                            <label class="flex items-center gap-2.5 cursor-pointer"><input type="radio" name="filter-cat" value="Todos" checked onchange="applyFilters()" class="accent-atlas-gold"> Todos os Gêneros</label>
+                            <label class="flex items-center gap-2.5 cursor-pointer"><input type="radio" name="filter-cat" value="Tecnologia" onchange="applyFilters()" class="accent-atlas-gold"> Tecnologia & IHC</label>
+                            <label class="flex items-center gap-2.5 cursor-pointer"><input type="radio" name="filter-cat" value="Ficção" onchange="applyFilters()" class="accent-atlas-gold"> Ficção Científica</label>
+                            <label class="flex items-center gap-2.5 cursor-pointer"><input type="radio" name="filter-cat" value="História" onchange="applyFilters()" class="accent-atlas-gold"> História & Humanas</label>
+                            <label class="flex items-center gap-2.5 cursor-pointer"><input type="radio" name="filter-cat" value="Filosofia" onchange="applyFilters()" class="accent-atlas-gold"> Filosofia Clássica</label>
                         </div>
                     </div>
-                </div>
-            </main>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Preço Máximo</h4>
+                            <span id="price-display" class="text-xs font-mono font-bold text-atlas-gold">R$ 150</span>
+                        </div>
+                        <input type="range" id="price-range" min="30" max="150" value="150" oninput="updatePriceDisplay(this.value)" onchange="applyFilters()" class="w-full accent-atlas-gold cursor-pointer" aria-label="Filtro de faixa de preço máximo de livros">
+                    </div>
+
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Avaliação Mínima</h4>
+                        <select id="rating-filter" onchange="applyFilters()" class="w-full bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-atlas-gold">
+                            <option value="0">Qualquer Avaliação</option>
+                            <option value="4">4+ Estrelas</option>
+                            <option value="5">Apenas 5 Estrelas</option>
+                        </select>
+                    </div>
+
+                    <button onclick="resetFilters()" class="w-full border-2 border-gray-200 dark:border-gray-700 hover:border-atlas-gold text-xs font-bold py-2 rounded-xl transition-all">Limpar Todos os Filtros</button>
+                </aside>
+
+                <section class="md:col-span-3 space-y-6" aria-label="Resultados do acervo">
+                    <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                </section>
+            </div>
         </section>
 
-        <!-- ================= PÁGINA DE PRODUTO ================= -->
-        <section id="view-produto" class="view-page hidden space-y-12">
-            <div class="grid md:grid-cols-2 gap-12 items-start">
-                <!-- Imagem do Livro / Capa -->
-                <div class="bg-white dark:bg-atlas-slate p-8 rounded-2xl border border-gray-200 dark:border-gray-800 flex justify-center shadow-md">
-                    <div class="w-64 h-96 bg-slate-200 dark:bg-slate-900 rounded-xl shadow-2xl flex items-center justify-center border border-gray-300 dark:border-gray-700">
-                        <i data-lucide="book-open" class="w-16 h-16 text-amber-500"></i>
-                    </div>
+        <section id="view-produto" class="view-transition hidden space-y-12">
+            <div id="product-root-content">
                 </div>
-
-                <!-- Detalhes do Produto -->
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <span class="text-amber-500 text-xs font-bold uppercase tracking-widest">Sistemas e IHC</span>
-                        <h1 class="text-3xl md:text-4xl font-serif font-bold">Princípios de IHC Aplicados</h1>
-                        <p class="text-sm text-gray-500">Edição Premium Limitada • Editora Atlas Academic</p>
+            
+            <div class="space-y-6 border-t border-gray-200 dark:border-gray-800 pt-12">
+                <h3 class="text-xl font-serif font-black text-atlas-navy dark:text-white">Leituras Acadêmicas Relacionadas</h3>
+                <div id="related-books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     </div>
+            </div>
+        </section>
 
-                    <!-- Avaliações Consolidadas -->
-                    <div class="flex items-center gap-2 text-sm text-amber-500">
-                        <div class="flex"><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i></div>
-                        <span class="font-bold text-slate-900 dark:text-white">4.9</span>
-                        <span class="text-gray-400">(142 resenhas de acadêmicos)</span>
+        <section id="view-contato" class="view-transition hidden space-y-12">
+            <div class="max-w-3xl mx-auto text-center space-y-3">
+                <h2 class="text-3xl font-serif font-black text-atlas-navy dark:text-white">Canais de Atendimento e FAQ</h2>
+                <p class="text-sm text-gray-500">Formulários validados em conformidade com as diretrizes de prevenção de erros IHC.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                <form id="contact-form" onsubmit="validateContactForm(event)" class="bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 p-8 rounded-3xl space-y-5 shadow-sm" novalidate>
+                    <div class="space-y-1.5">
+                        <label for="name-field" class="text-xs font-bold uppercase tracking-wider text-gray-400">Nome Completo</label>
+                        <input type="text" id="name-field" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-atlas-gold">
+                        <span id="name-error" class="text-red-500 text-xs font-medium hidden">Por favor, insira seu nome completo (mínimo de 3 caracteres).</span>
                     </div>
+                    <div class="space-y-1.5">
+                        <label for="email-field" class="text-xs font-bold uppercase tracking-wider text-gray-400">E-mail de Contato</label>
+                        <input type="email" id="email-field" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-atlas-gold">
+                        <span id="email-error" class="text-red-500 text-xs font-medium hidden">Por favor, insira um e-mail válido para contato.</span>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="message-field" class="text-xs font-bold uppercase tracking-wider text-gray-400">Mensagem Acadêmica</label>
+                        <textarea id="message-field" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-atlas-gold"></textarea>
+                        <span id="message-error" class="text-red-500 text-xs font-medium hidden">O corpo da mensagem não pode estar vazio.</span>
+                    </div>
+                    <button type="submit" class="w-full bg-atlas-navy dark:bg-atlas-gold text-white dark:text-atlas-navy font-bold py-3.5 rounded-xl transition-opacity hover:opacity-90 shadow-md">Enviar Mensagem</button>
+                </form>
 
-                    <!-- Preço e Botões Rápidos (Foco em Conversão e Baixo KLM) -->
-                    <div class="p-4 bg-gray-100 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <span class="text-xs text-gray-400 line-through">R$ 120,00</span>
-                            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">R$ 89,90</div>
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-serif font-bold text-atlas-navy dark:text-white">Dúvidas Frequentes (FAQ)</h3>
+                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-white dark:bg-atlas-slate shadow-sm">
+                            <button onclick="toggleAccordion('faq-1')" class="w-full px-5 py-4 text-left font-bold text-sm flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none">
+                                <span>Como funciona o frete e a entrega rápida?</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-atlas-gold"></i>
+                            </button>
+                            <div id="faq-1" class="hidden px-5 py-4 text-xs text-gray-500 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-900 leading-relaxed">
+                                Entregamos em todo o território nacional através de operadoras logísticas certificadas. O prazo médio de envio para capitais é de até 3 dias úteis.
+                            </div>
                         </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="addToCart()" class="flex-1 sm:flex-none bg-slate-800 text-white dark:bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 text-sm"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Adicionar</button>
-                            <button onclick="instantCheckout()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm shadow-md">Comprar Agora</button>
+                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-white dark:bg-atlas-slate shadow-sm">
+                            <button onclick="toggleAccordion('faq-2')" class="w-full px-5 py-4 text-left font-bold text-sm flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none">
+                                <span>Os livros físicos acompanham versão em e-book?</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-atlas-gold"></i>
+                            </button>
+                            <div id="faq-2" class="hidden px-5 py-4 text-xs text-gray-500 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-900 leading-relaxed">
+                                Sim. Todas as obras adquiridas na Atlas Livraria dão direito ao download imediato do arquivo digital acessível no formato ePub.
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Sinopse -->
-                    <div class="space-y-2">
-                        <h3 class="font-serif font-bold text-lg">Sinopse da Obra</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                            A bíblia moderna para projetistas que buscam excelência operacional em interfaces digitais. Kieras desmistifica os modelos matemáticos de comportamento cognitivo humano, permitindo calcular o tempo exato que um usuário levará para completar transações críticas no ambiente web.
-                        </p>
-                    </div>
-
-                    <!-- Ficha Técnica -->
-                    <div class="border-t border-gray-200 dark:border-gray-800 pt-4 grid grid-cols-2 gap-4 text-xs">
-                        <div><span class="text-gray-400">ISBN-13:</span> 978-3-16-148410-0</div>
-                        <div><span class="text-gray-400">Páginas:</span> 412 páginas</div>
-                        <div><span class="text-gray-400">Idioma:</span> Português (BR)</div>
-                        <div><span class="text-gray-400">Formato:</span> Capa Dura Premium</div>
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Nossa Sede Central</h3>
+                        <div class="w-full h-48 bg-slate-200 dark:bg-slate-800 rounded-2xl relative border border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center text-center p-4 shadow-inner">
+                            <div class="absolute inset-0 opacity-20 bg-[linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px)] [background-size:20px_20px]"></div>
+                            <i data-lucide="map-pin" class="text-atlas-gold w-8 h-8 mb-2 animate-bounce"></i>
+                            <span class="font-serif font-bold text-sm">Biblioteca Central Atlas</span>
+                            <span class="text-xs text-gray-400 max-w-xs mt-1">Av. do Conhecimento, 1000 - Campus Universitário, Bloco IHC</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- ================= CARRINHO DE COMPRAS ================= -->
-        <section id="view-carrinho" class="view-page hidden space-y-8">
-            <h1 class="text-2xl font-serif font-bold">Seu Tesouro Intelectual (Carrinho)</h1>
-            <div class="grid lg:grid-cols-3 gap-8">
-                <!-- Itens -->
-                <div class="lg:col-span-2 space-y-4">
-                    <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center">
-                        <div class="w-16 h-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                        <div class="flex-1">
-                            <h3 class="font-serif font-bold text-sm">Princípios de IHC Aplicados</h3>
-                            <p class="text-xs text-gray-400">Quantidade: 1</p>
-                        </div>
-                        <span class="font-bold text-amber-500">R$ 89,90</span>
-                    </div>
-                </div>
-                <!-- Resumo e Frete -->
-                <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 h-fit space-y-6">
-                    <h3 class="font-serif font-bold text-lg">Resumo do Pedido</h3>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between"><span>Subtotal:</span><span class="font-medium">R$ 89,90</span></div>
-                        <div class="flex justify-between text-green-500"><span>Cupom ATLASIHC:</span><span>- R$ 10,00</span></div>
-                        <div class="flex justify-between"><span>Frete (Expresso):</span><span class="text-gray-400">Grátis</span></div>
-                        <hr class="border-gray-200 dark:border-gray-800 my-2">
-                        <div class="flex justify-between text-base font-bold"><span>Total:</span><span class="text-amber-500">R$ 79,90</span></div>
-                    </div>
-                    <button onclick="switchPage('checkout')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg text-center block text-sm transition shadow-md">Prosseguir para o Checkout</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= CHECKOUT STEP-BY-STEP ================= -->
-        <section id="view-checkout" class="view-page hidden max-w-2xl mx-auto space-y-8">
-            <h1 class="text-2xl font-serif font-bold text-center">Finalização Ágil (Foco em Conversão)</h1>
-            <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 space-y-6">
-                <!-- Etapa 1: Endereço -->
-                <div>
-                    <h3 class="font-serif font-bold mb-3 flex items-center gap-2 text-sm"><span class="w-5 h-5 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-xs font-bold">1</span> Endereço de Destino</h3>
-                    <input type="text" placeholder="CEP (Autocompleta endereço)" class="w-full p-2 text-sm border rounded-lg bg-gray-50 dark:bg-slate-900 border-gray-300 dark:border-gray-700">
-                </div>
-                <!-- Etapa 2: Pagamento Simplificado -->
-                <div>
-                    <h3 class="font-serif font-bold mb-3 flex items-center gap-2 text-sm"><span class="w-5 h-5 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-xs font-bold">2</span> Método de Pagamento</h3>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <label class="border p-3 rounded-lg flex items-center gap-2 cursor-pointer border-amber-500 bg-amber-500/5"><input type="radio" name="pay" checked> <span>Pix (Aprovação Instantânea)</span></label>
-                        <label class="border p-3 rounded-lg flex items-center gap-2 cursor-pointer border-gray-300 dark:border-gray-700"><input type="radio" name="pay"> <span>Cartão de Crédito</span></label>
-                    </div>
-                </div>
-                <button onclick="confirmOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-center block text-sm transition shadow-lg">Fechar Pedido de Forma Segura</button>
-            </div>
-        </section>
-
-        <!-- ================= ÁREA DO CLIENTE ================= -->
-        <section id="view-cliente" class="view-page hidden space-y-8">
-            <div class="flex items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-6">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-600 flex items-center justify-center text-white text-xl font-bold font-serif shadow-md">U</div>
-                <div>
-                    <h1 class="text-2xl font-serif font-bold">Bento de Espinosa</h1>
-                    <p class="text-xs text-gray-400">ID de Explorador: #10294 • Nível 3 do Programa de Fidelidade Atlas</p>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Seções da conta -->
-                <div class="space-y-2">
-                    <button class="w-full text-left p-3 rounded-lg bg-amber-500 text-slate-900 font-bold text-sm flex items-center justify-between"><span>Histórico de Pedidos</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                    <button class="w-full text-left p-3 rounded-lg bg-white dark:bg-atlas-slate hover:bg-gray-100 text-sm flex items-center justify-between"><span>Lista de Desejos (7)</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                    <button class="w-full text-left p-3 rounded-lg bg-white dark:bg-atlas-slate hover:bg-gray-100 text-sm flex items-center justify-between"><span>Pontos de Fidelidade (450 pts)</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                </div>
-                <!-- Conteúdo dinâmico da seção selecionada -->
-                <div class="md:col-span-2 bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
-                    <h3 class="font-serif font-bold text-base">Últimos Pedidos Cadastrados</h3>
-                    <div class="p-4 border border-gray-200 dark:border-gray-800 rounded-lg flex justify-between items-center text-xs">
-                        <div>
-                            <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">Em Rota de Entrega</span>
-                            <h4 class="font-bold mt-1 text-sm">Pedido #2941-A</h4>
-                            <p class="text-gray-400">1x Estruturas Fundamentais de Dados</p>
-                        </div>
-                        <span class="font-bold text-amber-500 text-sm">R$ 74,30</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- FOOTER LITERÁRIO -->
-    <footer class="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-gray-800 py-12 text-center text-xs text-gray-400 space-y-4">
-        <p class="max-w-md mx-auto">"O conhecimento é um mapa para terras que ainda não cruzamos." — Livraria Atlas © 2026.</p>
-        <div class="flex justify-center gap-4 text-gray-500">
-            <a href="#" class="hover:text-amber-500">Políticas de Privacidade</a>
-            <span>•</span>
-            <a href="#" class="hover:text-amber-500">IHC Documentation</a>
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-white dark:bg-atlas-slate border-l border-gray-200 dark:border-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out hidden flex flex-col">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-atlas-navy text-white">
+            <h3 class="font-serif font-black text-lg text-atlas-gold flex items-center gap-2"><i data-lucide="shopping-basket"></i> Sua Sacola</h3>
+            <button onclick="toggleCartDrawer()" class="p-2 hover:bg-slate-800 rounded-lg text-gray-400 hover:text-white" aria-label="Fechar carrinho"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            </div>
+        <div class="p-6 border-t border-gray-200 dark:border-gray-800 space-y-4 bg-gray-50 dark:bg-slate-900">
+            <div class="flex justify-between font-bold text-sm">
+                <span>Subtotal (Valor Fixo Simulado)</span>
+                <span id="cart-total-display" class="text-atlas-gold text-base">R$ 0,00</span>
+            </div>
+            <button onclick="processCheckoutSimulated()" class="w-full bg-atlas-gold hover:bg-yellow-500 text-atlas-navy font-black py-3.5 rounded-xl shadow-md text-sm text-center block transition-all">Finalizar Compra Fictícia</button>
+        </div>
+    </div>
+
+    <div id="toast-app" role="alert" aria-live="assertive" class="fixed bottom-6 right-6 bg-atlas-navy text-white dark:bg-white dark:text-atlas-navy px-6 py-4 rounded-xl shadow-2xl border-l-4 border-atlas-gold font-bold text-sm translate-y-32 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i data-lucide="check-circle" class="text-atlas-gold"></i>
+        <span id="toast-text">Notificação de Sistema</span>
+    </div>
+
+    <footer class="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-gray-800 py-12 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
+            <div class="font-serif text-lg font-black tracking-wider text-atlas-navy dark:text-white">ATLAS LIVRARIA</div>
+            <p class="text-xs text-gray-400 max-w-md mx-auto">"O conhecimento é um mapa para terras que ainda não cruzamos." — Projeto em estrita conformidade com WCAG 2.2 AA e Heurísticas de Usabilidade.</p>
+            <div class="flex justify-center gap-4 text-[10px] uppercase font-bold tracking-wider text-gray-500">
+                <a href="#" onclick="switchView('catalogo'); return false;" class="hover:text-atlas-gold">Acervo Geral</a>
+                <span>•</span>
+                <a href="#" onclick="switchView('contato'); return false;" class="hover:text-atlas-gold">Documentação IHC</a>
+            </div>
         </div>
     </footer>
 
-    <!-- INTERACTION LOGIC / PROTOTYPE MOTOR -->
     <script>
-        // Inicialização dos ícones Lucide
-        lucide.createIcons();
+        // BANCO DE DADOS DE LIVROS FICTÍCIOS EXPANDIDO
+        const ATLAS_DATABASE = [
+            { id: 1, title: "Princípios de IHC Aplicados", author: "John Kieras", category: "Tecnologia", price: 1.00, rating: 5, bolds: "Mais Vendidos", imageColor: "bg-indigo-900", desc: "A obra definitiva e canônica sobre modelos preditivos estruturais matemáticos para interfaces web de alta performance comercial." },
+            { id: 2, title: "Design de Interfaces Escaláveis", author: "Clara Jenkins", category: "Tecnologia", price: 1.00, rating: 4, bolds: "Novidades", imageColor: "bg-teal-900", desc: "Como projetar frameworks baseados em arquiteturas atômicas e design systems industriais resilientes." },
+            { id: 3, title: "O Cosmos e o Caos Sideral", author: "Dr. Alistair Vance", category: "Ficção", price: 1.00, rating: 5, bolds: "Mais Vendidos", imageColor: "bg-purple-900", desc: "Uma odisséia hard-fi que explora os dilemas éticos da física quântica e da colonização espacial no braço de Órion." },
+            { id: 4, title: "Impérios de Ouro e Cinzas", author: "Marcus Aurelius", category: "História", price: 1.00, rating: 4, bolds: "Promoções", imageColor: "bg-red-900", desc: "Um estudo historiográfico preciso sobre o colapso estrutural das grandes economias e potências do mundo clássico." },
+            { id: 5, title: "Crônicas da Singularidade", author: "A. K. Wells", category: "Ficção", price: 1.00, rating: 5, bolds: "Novidades", imageColor: "bg-fuchsia-950", desc: "A Inteligência Artificial alcançou a semente da consciência. Um thriller filosófico sobre o futuro do desenvolvimento biológico." },
+            { id: 6, title: "Discursos sobre a Ética", author: "Spinoza", category: "Filosofia", price: 1.00, rating: 5, bolds: "Mais Vendidos", imageColor: "bg-emerald-950", desc: "Exposição geométrica rigorosa sobre as paixões humanas e a liberdade da mente no ambiente de convivência social." }
+        ];
 
-        // State do protótipo
-        let cartItemsCount = 0;
+        let internalCart = [];
 
-        // Função de navegação entre visões (SPA Model)
-        function switchPage(pageId) {
-            document.querySelectorAll('.view-page').forEach(page => {
-                page.classList.add('hidden');
+        // ROTEADOR DE VISÕES SPA E CONTROLE DE MENUS
+        function switchView(viewId) {
+            document.querySelectorAll('.view-transition').forEach(el => el.classList.add('hidden'));
+            const targetView = document.getElementById(`view-${viewId}`);
+            if(targetView) {
+                targetView.classList.remove('hidden');
+            }
+
+            // Tratamento de estados visíveis na barra de navegação
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-atlas-gold'));
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if(activeNav) activeNav.classList.add('text-atlas-gold');
+
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            document.getElementById('main-content').focus();
+        }
+
+        // MOTOR DE RENDERIZAÇÃO DE CARDS
+        function createBookCard(book) {
+            return `
+                <div class="bg-white dark:bg-atlas-slate rounded-2xl border border-gray-200 dark:border-gray-800 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200 relative group" aria-label="Livro: ${book.title}">
+                    <div onclick="openProductDetail(${book.id})" class="cursor-pointer space-y-3">
+                        <div class="w-full h-44 ${book.imageColor} rounded-xl shadow-inner flex items-center justify-center text-center p-3 font-serif font-bold text-atlas-gold text-xs relative overflow-hidden">
+                            <div class="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,transparent_25%,rgba(0,0,0,0.3)_50%,transparent_75%)]"></div>
+                            <span>${book.title}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold text-atlas-gold uppercase">${book.category}</span>
+                            <h4 class="font-bold font-serif text-sm text-atlas-navy dark:text-white line-clamp-1 mt-0.5">${book.title}</h4>
+                            <p class="text-xs text-gray-400">Por ${book.author}</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-atlas-gold text-xs">
+                            ${Array(book.rating).fill('<i data-lucide="star" class="w-3 h-3 fill-current"></i>').join('')}
+                            <span class="text-gray-400 text-[10px] ml-1">(${book.rating}.0)</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                        <span class="font-black text-atlas-navy dark:text-white text-sm">R$ ${book.price.toFixed(2)}</span>
+                        <button onclick="addItemToCart(${book.id})" class="bg-atlas-navy dark:bg-atlas-gold text-white dark:text-atlas-navy p-2 rounded-xl transition-opacity hover:opacity-90" aria-label="Adicionar ${book.title} à sacola">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // FILTRAGEM DINÂMICA CRUZADA SÍNCRONA
+        function applyFilters() {
+            const selectedCategory = document.querySelector('input[name="filter-cat"]:checked').value;
+            const maxPrice = parseFloat(document.getElementById('price-range').value);
+            const minRating = parseInt(document.getElementById('rating-filter').value);
+            const sortOrder = document.getElementById('sort-select').value;
+
+            let results = ATLAS_DATABASE.filter(book => {
+                const matchCat = (selectedCategory === "Todos" || book.category === selectedCategory);
+                const matchPrice = book.price <= maxPrice;
+                const matchRating = book.rating >= minRating;
+                return matchCat && matchPrice && matchRating;
             });
-            const activePage = document.getElementById(`view-${pageId}`);
-            if (activePage) {
-                activePage.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Ordenação
+            if(sortOrder === "menor-preco") results.sort((a,b) => a.price - b.price);
+            if(sortOrder === "maior-preco") results.sort((a,b) => b.price - a.price);
+            if(sortOrder === "mais-vendidos") results.sort((a,b) => b.id % 2 === 0 ? 1 : -1);
+
+            renderCatalogGrid(results);
+        }
+
+        function filterByCategory(cat) {
+            const radio = document.querySelector(`input[name="filter-cat"][value="${cat}"]`);
+            if(radio) {
+                radio.checked = true;
+                applyFilters();
+                switchView('catalogo');
             }
         }
 
-        // Simulação de carrinho para feedback imediato (Baixo tempo de preparação mental)
-        function addToCart() {
-            cartItemsCount++;
-            document.getElementById('cart-count').innerText = cartItemsCount;
-            alert('Item adicionado ao carrinho! Operador KLM validado com sucesso.');
+        function updatePriceDisplay(val) {
+            document.getElementById('price-display').innerText = `R$ ${val}`;
         }
 
-        function instantCheckout() {
-            switchPage('checkout');
+        function resetFilters() {
+            document.querySelector('input[name="filter-cat"][value="Todos"]').checked = true;
+            document.getElementById('price-range').value = 150;
+            updatePriceDisplay(150);
+            document.getElementById('rating-filter').value = 0;
+            applyFilters();
         }
 
-        function confirmOrder() {
-            alert('Pedido Concluído! Protótipo de IHC processou a rota final.');
-            cartItemsCount = 0;
-            document.getElementById('cart-count').innerText = cartItemsCount;
-            switchPage('home');
-        }
-
-        // Alternador de Modo Escuro / Claro
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                html.classList.add('light');
-            } else {
-                html.classList.remove('light');
-                html.classList.add('dark');
+        function renderCatalogGrid(data) {
+            const grid = document.getElementById('catalog-grid');
+            if(data.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 font-medium text-gray-400">Nenhum livro localizado nos critérios informados.</div>`;
+                return;
             }
+            grid.innerHTML = data.map(b => createBookCard(b)).join('');
+            lucide.createIcons();
         }
 
-        // ACESSIBILIDADE E MAPEAMENTO DE ATALHOS KLM (Teclas de Função para evitar chaveamento de contexto H)
-        window.addEventListener('keydown', function(e) {
-            if (e.key === 'F1') { e.preventDefault(); switchPage('home'); }
-            if (e.key === 'F2') { e.preventDefault(); switchPage('categoria'); }
-            if (e.key === 'F3') { e.preventDefault(); switchPage('produto'); }
-            if (e.key === 'F4') { e.preventDefault(); switchPage('carrinho'); }
-            if (e.key === 'F5') { e.preventDefault(); switchPage('checkout'); }
-            if (e.key === 'F6') { e.preventDefault(); switchPage('cliente'); }
+        // DETALHAMENTO DE PRODUTO DINÂMICO INDIVIDUAL
+        function openProductDetail(id) {
+            const book = ATLAS_DATABASE.find(b => b.id === id);
+            if(!book) return;
+
+            const root = document.getElementById('product-root-content');
+            root.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start bg-white dark:bg-atlas-slate p-6 md:p-10 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <div class="w-full h-96 ${book.imageColor} rounded-2xl flex items-center justify-center text-center p-6 shadow-md border-2 border-atlas-gold/20 font-serif font-black text-white text-xl relative">
+                        <div class="absolute left-0 top-0 bottom-0 w-4 bg-black/20"></div>
+                        <span>${book.title}</span>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold uppercase tracking-widest text-atlas-gold bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-atlas-gold/20">${book.category}</span>
+                            <h1 class="text-3xl md:text-4xl font-serif font-black text-atlas-navy dark:text-white mt-1">${book.title}</h1>
+                            <p class="text-sm text-gray-400">Publicado por Atlas Academic Editorial • Autor: ${book.author}</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-atlas-gold">
+                            <div class="flex">${Array(book.rating).fill('<i data-lucide="star" class="w-4 h-4 fill-current"></i>').join('')}</div>
+                            <span class="font-bold text-slate-900 dark:text-white">${book.rating}.0</span>
+                            <span class="text-gray-400 text-xs">(100% de avaliações acadêmicas recomendadas)</span>
+                        </div>
+                        <div class="text-3xl font-black text-atlas-navy dark:text-white">R$ ${book.price.toFixed(2)}</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">${book.desc}</p>
+                        <div class="flex gap-4 pt-2">
+                            <button onclick="addItemToCart(${book.id})" class="flex-1 bg-atlas-gold hover:bg-yellow-500 text-atlas-navy font-black py-4 rounded-xl flex items-center justify-center gap-2 text-sm shadow-md transition-all">Adicionar à Sacola</button>
+                            <button onclick="triggerToast('Item adicionado aos desejos!')" class="border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 p-4 rounded-xl hover:text-red-500 transition-colors" aria-label="Favoritar esta obra"><i data-lucide="heart" class="w-5 h-5"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            // Atalho de foco na busca '/' para mitigar uso de mouse (Operador P)
+            // Recomendações relacionadas do mesmo gênero
+            const related = ATLAS_DATABASE.filter(b => b.category === book.category && b.id !== book.id);
+            document.getElementById('related-books-grid').innerHTML = related.map(b => createBookCard(b)).join('');
+
+            switchView('produto');
+            lucide.createIcons();
+        }
+
+        // SISTEMA DE GERENCIAMENTO DE CARRINHO SIMULADO A R$ 1,00
+        function addItemToCart(id) {
+            const book = ATLAS_DATABASE.find(b => b.id === id);
+            if(!book) return;
+
+            internalCart.push(book);
+            updateCartUI();
+            triggerToast(`"${book.title}" adicionado à sacola!`);
+        }
+
+        function updateCartUI() {
+            document.getElementById('global-cart-badge').innerText = internalCart.length;
+            const container = document.getElementById('cart-items-container');
+            
+            if(internalCart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-sm text-gray-400 font-medium">Sua sacola de acervo está vazia.</div>`;
+                document.getElementById('cart-total-display').innerText = "R$ 0,00";
+                return;
+            }
+
+            container.innerHTML = internalCart.map((item, index) => `
+                <div class="flex gap-4 items-center bg-gray-50 dark:bg-slate-900 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div class="w-10 h-14 ${item.imageColor} rounded shadow-sm flex-shrink-0 flex items-center justify-center font-serif text-[6px] text-white font-bold p-1"><span>${item.title}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-xs text-atlas-navy dark:text-white truncate">${item.title}</h4>
+                        <span class="text-[10px] text-gray-400">R$ ${item.price.toFixed(2)}</span>
+                    </div>
+                    <button onclick="removeCartItem(${index})" class="text-gray-400 hover:text-red-500 p-1" aria-label="Excluir item"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+
+            const total = internalCart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cart-total-display').innerText = `R$ ${total.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function removeCartItem(index) {
+            internalCart.splice(index, 1);
+            updateCartUI();
+            triggerToast("Item removido do carrinho.");
+        }
+
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
+            if(!drawer.classList.contains('hidden')) {
+                setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+            } else {
+                drawer.classList.add('translate-x-full');
+            }
+        }
+
+        function processCheckoutSimulated() {
+            if(internalCart.length === 0) {
+                triggerToast("Sua sacola está vazia.");
+                return;
+            }
+            alert("Checkout Acadêmico Concluído com Sucesso!\nOs itens simulados a R$ 1.00 foram processados no modelo de testes.");
+            internalCart = [];
+            updateCartUI();
+            toggleCartDrawer();
+            switchView('home');
+        }
+
+        // SISTEMA DE FEEDBACK ACCESSIBLE TOAST
+        function triggerToast(text) {
+            const toast = document.getElementById('toast-app');
+            document.getElementById('toast-text').innerText = text;
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 3000);
+        }
+
+        // ACCORDION E VALIDAÇÃO DE INTERFACE (CONTATO)
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        function validateContactForm(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            const name = document.getElementById('name-field');
+            if(name.value.trim().length < 3) {
+                document.getElementById('name-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('name-error').classList.add('hidden');
+            }
+
+            const email = document.getElementById('email-field');
+            if(!email.value.includes('@') || email.value.length < 5) {
+                document.getElementById('email-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('email-error').classList.add('hidden');
+            }
+
+            if(isValid) {
+                triggerToast("Mensagem enviada com sucesso!");
+                document.getElementById('contact-form').reset();
+            }
+        }
+
+        // ALTERNADOR DE ALTO CONTRASTE / DARK MODE
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // MAPEAMENTO DE ATALHOS DE TECLADO (Mitigação de Operadores KLM)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F1') { e.preventDefault(); switchView('home'); }
+            if (e.key === 'F2') { e.preventDefault(); switchView('catalogo'); }
+            if (e.key === 'F3') { e.preventDefault(); switchView('contato'); }
+            
             if (e.key === '/') {
-                const searchInput = document.getElementById('global-search');
-                if (document.activeElement !== searchInput) {
+                const bar = document.getElementById('search-bar');
+                if (document.activeElement !== bar) {
                     e.preventDefault();
-                    searchInput.focus();
+                    switchView('catalogo');
+                    bar.focus();
                 }
             }
+        });
+
+        // INICIALIZAÇÃO INICIAL DA PLATAFORMA
+        document.addEventListener('DOMContentLoaded', () => {
+            // Renderização inicial de dados estáticos
+            const highlights = ATLAS_DATABASE.slice(0, 4);
+            document.getElementById('home-highlights-grid').innerHTML = highlights.map(b => createBookCard(b)).join('');
+            renderCatalogGrid(ATLAS_DATABASE);
+            
+            switchView('home');
+            lucide.createIcons();
         });
     </script>
 </body>
