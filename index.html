@@ -1,949 +1,467 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Livraria Atlas | IHC & KLM Benchmark Prototype</title>
-    <!-- Fonte sofisticada e legível (KLM: Reduz tempo de varredura visual) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Ícones modernos e minimalistas -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* ==========================================================================
-           DESIGN SYSTEM & VARIÁVEIS (Padrão Premium Minimalista)
-           ========================================================================== */
-        :root {
-            --primary-navy: #0A192F;
-            --secondary-gold: #D4AF37;
-            --gold-hover: #AA8B2C;
-            --bg-light: #F8FAFC;
-            --surface-light: #FFFFFF;
-            --text-light: #1E293B;
-            --text-muted-light: #64748B;
-            --border-light: #E2E8F0;
-            
-            /* Transições suaves para não quebrar a carga cognitiva */
-            --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --border-radius: 6px;
-            --max-width: 1200px;
-        }
-
-        [data-theme="dark"] {
-            --primary-navy: #020C1B;
-            --bg-light: #0A192F;
-            --surface-light: #112240;
-            --text-light: #F4F6F9;
-            --text-muted-light: #A8B2D1;
-            --border-light: #233554;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-light);
-            line-height: 1.6;
-            transition: var(--transition-smooth);
-        }
-
-        h1, h2, h3, .brand-logo {
-            font-family: 'Cinzel', serif;
-        }
-
-        .container {
-            width: 100%;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Otimização KLM: Foco visual claro para navegação por teclado */
-        *:focus-visible {
-            outline: 2px solid var(--secondary-gold);
-            outline-offset: 3px;
-        }
-
-        /* ==========================================================================
-           HEADER & NAVIGATION (Foco em Fitts' Law e KLM: Alvos grandes)
-           ========================================================================== */
-        header {
-            background-color: var(--primary-navy);
-            color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid var(--secondary-gold);
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-        }
-
-        .brand-logo {
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: 2px;
-        }
-
-        .brand-logo span {
-            color: var(--secondary-gold);
-        }
-
-        nav {
-            display: flex;
-            gap: 25px;
-        }
-
-        .nav-link {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: var(--transition-smooth);
-            position: relative;
-            padding: 5px 0;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--secondary-gold);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            position: relative;
-            padding: 8px;
-        }
-
-        .action-btn:hover {
-            color: var(--secondary-gold);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background-color: var(--secondary-gold);
-            color: var(--primary-navy);
-            font-size: 10px;
-            font-weight: 700;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ==========================================================================
-           VIEWS MANAGER (SPA ENGINE)
-           ========================================================================== */
-        .view-section {
-            display: none;
-            animation: fadeIn 0.25s ease-out;
-            padding: 40px 0;
-        }
-
-        .view-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ==========================================================================
-           HOME VIEW COMPONENTS
-           ========================================================================== */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-navy) 0%, #112240 100%);
-            color: white;
-            padding: 80px 60px;
-            border-radius: var(--border-radius);
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            right: -100px;
-            bottom: -100px;
-            width: 400px;
-            height: 400px;
-            border: 2px solid rgba(212, 175, 55, 0.05);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .hero-content {
-            max-width: 550px;
-        }
-
-        .hero-tag {
-            color: var(--secondary-gold);
-            text-transform: uppercase;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .hero h1 {
-            font-size: 42px;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
-
-        /* Otimização KLM: Barra de pesquisa unificada com acionamento imediato */
-        .search-container {
-            display: flex;
-            background: var(--surface-light);
-            border-radius: var(--border-radius);
-            padding: 4px;
-            margin-top: 30px;
-            border: 1px solid var(--border-light);
-        }
-
-        .search-container input {
-            flex: 1;
-            border: none;
-            padding: 12px 16px;
-            font-size: 14px;
-            color: var(--text-light);
-            background: transparent;
-            outline: none;
-        }
-
-        .search-container button {
-            background: var(--primary-navy);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition-smooth);
-        }
-
-        .search-container button:hover {
-            background: var(--secondary-gold);
-            color: var(--primary-navy);
-        }
-
-        /* GRID DE PRODUTOS */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-left: 4px solid var(--secondary-gold);
-            padding-left: 15px;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .product-card {
-            background: var(--surface-light);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            padding: 16px;
-            transition: var(--transition-smooth);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            border-color: var(--secondary-gold);
-        }
-
-        .book-cover-wrapper {
-            background: #E2E8F0;
-            height: 280px;
-            border-radius: calc(var(--border-radius) - 2px);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-navy);
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .tag-promo {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--secondary-gold);
-            color: var(--primary-navy);
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 3px;
-        }
-
-        .product-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .product-author {
-            font-size: 13px;
-            color: var(--text-muted-light);
-            margin-bottom: 10px;
-        }
-
-        .product-price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-        }
-
-        .price {
-            font-weight: 700;
-            color: var(--primary-navy);
-            font-size: 16px;
-        }
-        [data-theme="dark"] .price { color: var(--secondary-gold); }
-
-        /* Otimização KLM: Botão de ação direta reduz a necessidade de abrir o produto */
-        .add-fast-btn {
-            background: none;
-            border: 1px solid var(--border-light);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-        }
-
-        .add-fast-btn:hover {
-            background: var(--primary-navy);
-            color: white;
-            border-color: var(--primary-navy);
-        }
-
-        /* ==========================================================================
-           CATEGORY VIEW COMPONENTS (Filtros Avançados Diretos)
-           ========================================================================== */
-        .category-layout {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 30px;
-        }
-
-        .filter-sidebar {
-            background: var(--surface-light);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            height: fit-content;
-        }
-
-        .filter-group {
-            margin-bottom: 25px;
-        }
-
-        .filter-group h4 {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            color: var(--text-light);
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 5px;
-        }
-
-        .filter-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        .filter-option input {
-            accent-color: var(--secondary-gold);
-        }
-
-        /* ==========================================================================
-           PRODUCT DETAIL VIEW
-           ========================================================================== */
-        .product-detail-layout {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 50px;
-        }
-
-        .detail-cover {
-            height: 550px;
-            background: #E2E8F0;
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-size: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .detail-info h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .detail-meta {
-            color: var(--text-muted-light);
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .detail-price {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-navy);
-            margin-bottom: 25px;
-        }
-        [data-theme="dark"] .detail-price { color: var(--secondary-gold); }
-
-        .detail-synopsis {
-            margin-bottom: 30px;
-            color: var(--text-light);
-            font-size: 15px;
-        }
-
-        .action-group-p {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        .btn-premium {
-            padding: 15px 30px;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            font-size: 15px;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--primary-navy);
-            color: white;
-            flex: 2;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary-gold);
-            color: var(--primary-navy);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-light);
-            color: var(--text-light);
-            flex: 1;
-        }
-
-        /* ==========================================================================
-           CARRINHO & CHECKOUT (Foco em Conversão e Erros sob KLM/Kieras)
-           ========================================================================== */
-        .cart-layout {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 30px;
-        }
-
-        .cart-items-list {
-            background: var(--surface-light);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            padding: 20px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .cart-item:last-child { border: none; }
-
-        .summary-box {
-            background: var(--surface-light);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            height: fit-content;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .summary-total {
-            border-top: 1px solid var(--border-light);
-            padding-top: 15px;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        /* CHECKOUT STEPS FORM (KLM: Redução de inputs repetitivos) */
-        .checkout-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            background: var(--surface-light);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-light);
-        }
-
-        .step-indicator {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted-light);
-        }
-
-        .step-indicator.active {
-            color: var(--secondary-gold);
-        }
-
-        .form-control {
-            margin-bottom: 15px;
-        }
-
-        .form-control label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .form-control input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius);
-            background: var(--surface-light);
-            color: var(--text-light);
-        }
-
-        /* RESPONSIVIDADE */
-        @media (max-width: 992px) {
-            .category-layout, .product-detail-layout, .cart-layout {
-                grid-template-columns: 1fr;
+    <title>Livraria Atlas | IHC Prototype (KLM/Kieras Optimized)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        atlas: {
+                            navy: '#0b132b',
+                            gold: '#d4af37',
+                            goldlight: '#f3e5ab',
+                            slate: '#1c2541'
+                        }
+                    }
+                }
             }
-            .hero { padding: 40px; }
-            .hero h1 { font-size: 32px; }
         }
-    </style>
+    </script>
+    <!-- Lucide Icons para ícones minimalistas -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body data-theme="light">
+<body class="bg-gray-50 text-slate-900 dark:bg-atlas-navy dark:text-gray-100 transition-colors duration-200 font-sans">
 
-    <!-- ==========================================================================
-         HEADER / BARRA DE NAVEGAÇÃO SUPERIOR
-         ========================================================================== -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="brand-logo" onclick="navigate('home')">
-                ATLAS<span>.</span>
+    <!-- IHC EVALUATOR PANEL (Apoio para testes KLM/Kieras) -->
+    <div class="bg-amber-500 text-slate-900 p-2 text-center text-xs font-mono font-bold flex justify-between items-center px-4 sticky top-0 z-50 shadow-md">
+        <span>[IHC MODELO KLM/KIERAS] Atalhos de teclado ativos para reduzir operador $H$ e $P$.</span>
+        <div class="space-x-2">
+            <button onclick="switchPage('home')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Home (F1)</button>
+            <button onclick="switchPage('categoria')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Catálogo (F2)</button>
+            <button onclick="switchPage('produto')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Produto (F3)</button>
+            <button onclick="switchPage('carrinho')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Carrinho (F4)</button>
+            <button onclick="switchPage('checkout')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Checkout (F5)</button>
+            <button onclick="switchPage('cliente')" class="bg-slate-900 text-white px-2 py-0.5 rounded hover:bg-slate-700">Área Cliente (F6)</button>
+        </div>
+        <button onclick="toggleDarkMode()" class="bg-slate-900 text-white p-1 rounded-full"><i data-lucide="moon" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <header class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-atlas-slate/80 backdrop-blur sticky top-8 z-40">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <!-- Logo ATLAS -->
+            <a href="#" onclick="switchPage('home')" class="flex items-center gap-2 font-serif text-2xl font-bold tracking-wider text-atlas-navy dark:text-white">
+                <i data-lucide="compass" class="text-amber-500 w-7 h-7"></i>
+                ATLAS
             </a>
-            
-            <nav>
-                <a href="#" class="nav-link active" id="nav-home" onclick="navigate('home')">Início</a>
-                <a href="#" class="nav-link" id="nav-catalog" onclick="navigate('catalog')">Explorar</a>
-                <a href="#" class="nav-link" id="nav-client" onclick="navigate('client')">Área do Cliente</a>
-            </nav>
 
-            <div class="header-actions">
-                <button class="action-btn" onclick="toggleTheme()" title="Alternar Modo Visão (KLM Economia Mental)">
-                    <i class="fa-solid fa-moon" id="theme-icon"></i>
-                </button>
-                <button class="action-btn" onclick="navigate('cart')" title="Ir para o carrinho">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span class="cart-count" id="cart-counter">0</span>
-                </button>
+            <!-- BUSCA AVANÇADA (KLM OTIMIZADA: Foco automático com '/' ou clique único) -->
+            <div class="flex-1 max-w-xl relative">
+                <input id="global-search" type="text" placeholder="Buscar por título, autor, ISBN... (Pressione '/' para focar)" 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-400 w-5 h-5"></i>
             </div>
+
+            <!-- NAVEGAÇÃO RÁPIDA -->
+            <nav class="flex items-center gap-6">
+                <button onclick="switchPage('categoria')" class="hover:text-amber-500 flex items-center gap-1 font-medium"><i data-lucide="book-open" class="w-4 h-4"></i> Categorias</button>
+                <button onclick="switchPage('cliente')" class="hover:text-amber-500 flex items-center gap-1 font-medium"><i data-lucide="user" class="w-4 h-4"></i> Conta</button>
+                <button onclick="switchPage('carrinho')" class="relative hover:text-amber-500 font-medium flex items-center gap-1">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-3 bg-amber-500 text-slate-900 text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </nav>
         </div>
     </header>
 
-    <main class="container">
-        
-        <!-- ==========================================================================
-             VIEW: HOME PAGE
-             ========================================================================== -->
-        <section id="view-home" class="view-section active">
-            <div class="hero">
-                <div class="hero-content">
-                    <span class="hero-tag">Conhecimento & Exploração</span>
-                    <h1>Descubra sua próxima grande fronteira intelectual.</h1>
-                    <p>Curadoria exclusiva de literatura, tecnologia, negócios e expansão pessoal sob uma ótica premium.</p>
-                    
-                    <!-- Busca Avançada Otimizada KLM: Sem subpáginas, resposta em lote -->
-                    <div class="search-container">
-                        <input type="text" id="main-search" placeholder="Busque por título, autor ou gênero..." onkeyup="handleSearch(event)">
-                        <button onclick="triggerSearch()">Buscar</button>
-                    </div>
-                </div>
-            </div>
+    <!-- MAIN CONTENT VIEWPORT -->
+    <main class="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-12rem)]">
 
-            <div class="section-header">
-                <h2>Lançamentos e Destaques da Semana</h2>
-            </div>
-            <div class="product-grid" id="featured-books">
-                <!-- Injetado dinamicamente via JS para simulação de dados reais -->
-            </div>
-
-            <div class="section-header">
-                <h2>Os Mais Vendidos de Atlas</h2>
-            </div>
-            <div class="product-grid" id="bestseller-books">
-                <!-- Injetado via JS -->
-            </div>
-        </section>
-
-        <!-- ==========================================================================
-             VIEW: CATEGORIA / CATÁLOGO COMPLETO
-             ========================================================================== -->
-        <section id="view-catalog" class="view-section">
-            <div class="category-layout">
-                <aside class="filter-sidebar">
-                    <div class="filter-group">
-                        <h4>Gênero</h4>
-                        <label class="filter-option"><input type="checkbox" checked> Ficção e Fantasia</label>
-                        <label class="filter-option"><input type="checkbox" checked> Tecnologia & IA</label>
-                        <label class="filter-option"><input type="checkbox" checked> Negócios & Finanças</label>
-                        <label class="filter-option"><input type="checkbox" checked> Auto-Desenvolvimento</label>
-                    </div>
-                    <div class="filter-group">
-                        <h4>Preço</h4>
-                        <label class="filter-option"><input type="radio" name="price-filter"> Até R$ 50</label>
-                        <label class="filter-option"><input type="radio" name="price-filter" checked> R$ 50 a R$ 150</label>
-                    </div>
-                </aside>
-
-                <div>
-                    <div class="section-header">
-                        <h2>Catálogo de Exploração</h2>
-                    </div>
-                    <div class="product-grid" id="catalog-books"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==========================================================================
-             VIEW: DETALHE DO PRODUTO
-             ========================================================================== -->
-        <section id="view-product" class="view-section">
-            <div class="product-detail-layout" id="product-detail-content">
-                <!-- Renderizado dinamicamente com base no clique -->
-            </div>
-        </section>
-
-        <!-- ==========================================================================
-             VIEW: CARRINHO DE COMPRAS
-             ========================================================================== -->
-        <section id="view-cart" class="view-section">
-            <div class="section-header">
-                <h2>Seu Carrinho de Leituras</h2>
-            </div>
-            <div class="cart-layout">
-                <div class="cart-items-list" id="cart-items-container">
-                    <!-- Dinâmico -->
-                </div>
-                <div class="summary-box">
-                    <h3>Resumo do Pedido</h3>
-                    <br>
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="summary-subtotal">R$ 0,00</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Frete Base (Fixo Atlas)</span>
-                        <span>R$ 12,00</span>
-                    </div>
-                    <div class="summary-row summary-total">
-                        <span>Total Geral</span>
-                        <span id="summary-total">R$ 12,00</span>
-                    </div>
-                    <button class="btn-premium btn-primary" style="width: 100%; margin-top: 15px;" onclick="navigate('checkout')">
-                        Prosseguir para o Checkout
+        <!-- ================= HOME PAGE ================= -->
+        <section id="view-home" class="view-page space-y-16">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-atlas-navy to-atlas-slate rounded-2xl p-8 md:p-16 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl">
+                <div class="space-y-6 max-w-xl">
+                    <span class="text-amber-500 font-semibold tracking-widest uppercase text-sm">Lançamento Exclusivo</span>
+                    <h1 class="text-4xl md:text-5xl font-serif font-bold leading-tight">Explore os confins do conhecimento humano.</h1>
+                    <p class="text-gray-300 text-lg">"Arquitetura de Sistemas Antigos" — A obra definitiva para engenheiros e historiadores de tecnologia.</p>
+                    <button onclick="switchPage('produto')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition shadow-lg">
+                        Descobrir Obra <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                 </div>
+                <div class="w-48 h-72 bg-amber-900/50 rounded-lg shadow-2xl border border-amber-500/30 flex items-center justify-center text-center p-4">
+                    <span class="font-serif italic text-amber-500">Capa do Livro em Destaque</span>
+                </div>
+            </div>
+
+            <!-- Categorias Principais -->
+            <div>
+                <h2 class="text-2xl font-serif font-bold mb-6 flex items-center gap-2"><i data-lucide="layout-grid" class="text-amber-500"></i> Categorias em Destaque</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="cpu" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Tecnologia</span>
+                    </div>
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="trending-up" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Negócios</span>
+                    </div>
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="sparkles" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Ficção e Fantasia</span>
+                    </div>
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="heart" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Romance</span>
+                    </div>
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="smile" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Desenv. Pessoal</span>
+                    </div>
+                    <div onclick="switchPage('categoria')" class="p-4 bg-white dark:bg-atlas-slate border border-gray-200 dark:border-gray-800 rounded-xl text-center cursor-pointer hover:border-amber-500 transition">
+                        <i data-lucide="graduation-cap" class="mx-auto mb-2 text-amber-500"></i><span class="text-sm font-medium">Universitários</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Mais Vendidos & Promoções -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Promoções da Semana -->
+                <div class="md:col-span-1 bg-amber-50 dark:bg-slate-900/40 p-6 rounded-2xl border border-amber-200 dark:border-amber-900/50">
+                    <h3 class="text-xl font-serif font-bold mb-4 flex items-center gap-2 text-amber-800 dark:text-amber-400"><i data-lucide="percent"></i> Ofertas Clássicas</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-center bg-white dark:bg-atlas-slate p-3 rounded-xl shadow-sm cursor-pointer" onclick="switchPage('produto')">
+                            <div class="w-12 h-16 bg-gray-200 dark:bg-gray-800 rounded flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-bold text-sm line-clamp-1">O Labirinto da Mente</h4>
+                                <p class="text-xs text-gray-500">R$ 29,90 <span class="line-through text-[10px]">R$ 59,90</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mais Vendidos (Grid de Produtos Principal) -->
+                <div class="md:col-span-2 space-y-6">
+                    <h3 class="text-xl font-serif font-bold flex items-center gap-2"><i data-lucide="zap" class="text-amber-500"></i> Mais Procurados na Atlas</h3>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <!-- Card Produto Exemplo -->
+                        <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                            <div onclick="switchPage('produto')" class="cursor-pointer">
+                                <div class="w-full h-40 bg-gray-200 dark:bg-slate-800 rounded-lg mb-3 flex items-center justify-center text-gray-400"><i data-lucide="book" class="w-8 h-8"></i></div>
+                                <h4 class="font-bold font-serif line-clamp-1">Princípios de IHC Aplicados</h4>
+                                <p class="text-xs text-gray-500 mb-2">Por John Kieras</p>
+                                <div class="flex items-center gap-1 text-amber-500 text-xs mb-2">
+                                    <i data-lucide="star" class="w-3 h-3 fill-current"></i> 4.9 <span class="text-gray-400 text-[10px]">(142 avaliações)</span>
+                                    <span class="ml-auto bg-green-100 text-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded">Fidelidade +10%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                <span class="font-bold text-amber-600 dark:text-amber-400">R$ 89,90</span>
+                                <button onclick="addToCart()" class="bg-atlas-navy dark:bg-amber-500 dark:text-slate-900 text-white p-2 rounded-lg hover:opacity-90 transition"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descubra sua Próxima Leitura / Sistema de Recomendação -->
+            <div class="bg-slate-100 dark:bg-slate-900 p-8 rounded-2xl text-center space-y-4 border border-gray-200 dark:border-gray-800">
+                <h3 class="text-xl font-serif font-bold">Descubra sua Próxima Leitura Inteligente</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">Selecione seus interesses dominantes e nossa IA gerará uma trilha de conhecimento sob medida.</p>
+                <div class="flex justify-center gap-2 flex-wrap max-w-xl mx-auto">
+                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Sistemas Distribuídos</button>
+                    <button class="px-3 py-1.5 rounded-full border border-amber-500 text-xs bg-amber-500/10 text-amber-600 font-bold">Ficção Científica Hard</button>
+                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Alta Fantasia</button>
+                    <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs bg-white dark:bg-atlas-slate hover:border-amber-500">Finanças Quantitativas</button>
+                </div>
+            </div>
+
+            <!-- Newsletter & Depoimentos -->
+            <div class="grid md:grid-cols-2 gap-8 items-center border-t border-gray-200 dark:border-gray-800 pt-12">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-serif font-bold">As Crônicas da Atlas</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Ensaios literários, curadorias profundas e avisos de edições raras direto no seu e-mail.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Seu melhor e-mail institucional ou pessoal" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900">
+                        <button class="bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-bold hover:bg-amber-600 text-sm">Inscrever-se</button>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <p class="italic text-sm text-gray-600 dark:text-gray-400">"A experiência de busca rápida por atalhos no teclado transformou a forma como monto minha bibliografia acadêmica. A Atlas respeita o tempo do usuário."</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center font-bold text-xs text-slate-900">A</div>
+                        <div>
+                            <h5 class="text-xs font-bold">Prof. Dr. Arthur Silva</h5>
+                            <p class="text-[10px] text-gray-400">Membro Premium Atlas (Nível 4)</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ==========================================================================
-             VIEW: CHECKOUT MINIMALISTA
-             ========================================================================== -->
-        <section id="view-checkout" class="view-section">
-            <div class="checkout-steps">
-                <span class="step-indicator active">1. Identificação</span>
-                <span class="step-indicator active">2. Envio</span>
-                <span class="step-indicator">3. Pagamento Seguro</span>
-            </div>
+        <!-- ================= PÁGINA DE CATEGORIA / CATÁLOGO ================= -->
+        <section id="view-categoria" class="view-page hidden grid md:grid-cols-4 gap-8">
+            <!-- Filtros (Lateral) -->
+            <aside class="space-y-6">
+                <div>
+                    <h3 class="font-serif font-bold text-lg border-b pb-2 mb-4">Filtrar Acervo</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Gênero</label>
+                            <div class="space-y-1 text-sm">
+                                <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-amber-500"> Tecnologia (42)</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-amber-500"> Filosofia (18)</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-amber-500"> Finanças (23)</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Faixa de Preço</label>
+                            <input type="range" class="w-full accent-amber-500" min="0" max="300" value="150">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1"><span>R$ 0</span><span>R$ 300</span></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
-            <div style="max-width: 600px; margin: 0 auto; background: var(--surface-light); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--border-light);">
-                <h3 style="margin-bottom: 20px;">Dados de Entrega Expressa</h3>
-                <div class="form-control">
-                    <label>Endereço Completo</label>
-                    <input type="text" value="Av. Paulista, 1000 - Bela Vista, São Paulo - SP">
+            <!-- Grid de Produtos e Ordenação -->
+            <main class="md:col-span-3 space-y-6">
+                <div class="flex justify-between items-center bg-white dark:bg-atlas-slate p-3 rounded-xl border border-gray-200 dark:border-gray-800 text-sm">
+                    <span>Exibindo <strong>12</strong> de 42 livros em <strong>Tecnologia</strong></span>
+                    <select class="bg-transparent border-none outline-none font-medium focus:ring-0 cursor-pointer">
+                        <option>Ordenar por: Relevância</option>
+                        <option>Menor Preço</option>
+                        <option>Maior Preço</option>
+                        <option>Mais Populares</option>
+                    </select>
                 </div>
-                <div class="form-control">
-                    <label>Número do Cartão (Simulação IHC)</label>
-                    <input type="text" placeholder="XXXX XXXX XXXX XXXX" value="4532 7182 9912 0023">
+
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <!-- Produto 1 -->
+                    <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+                        <div onclick="switchPage('produto')" class="cursor-pointer">
+                            <div class="w-full h-44 bg-gray-200 dark:bg-slate-800 rounded-lg mb-3 flex items-center justify-center text-gray-400"><i data-lucide="book" class="w-8 h-8"></i></div>
+                            <h4 class="font-bold font-serif line-clamp-1">Design Systems Escaláveis</h4>
+                            <p class="text-xs text-gray-500">Clara Jenkins</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="font-bold text-amber-600 dark:text-amber-400">R$ 112,00</span>
+                            <button onclick="addToCart()" class="bg-atlas-navy dark:bg-amber-500 dark:text-slate-900 text-white p-2 rounded-lg"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn-premium btn-primary" style="width: 100%; margin-top: 20px;" onclick="processOrder()">
-                    Confirmar Compra e Gerar Ordem (KLM Trigger)
-                </button>
+            </main>
+        </section>
+
+        <!-- ================= PÁGINA DE PRODUTO ================= -->
+        <section id="view-produto" class="view-page hidden space-y-12">
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <!-- Imagem do Livro / Capa -->
+                <div class="bg-white dark:bg-atlas-slate p-8 rounded-2xl border border-gray-200 dark:border-gray-800 flex justify-center shadow-md">
+                    <div class="w-64 h-96 bg-slate-200 dark:bg-slate-900 rounded-xl shadow-2xl flex items-center justify-center border border-gray-300 dark:border-gray-700">
+                        <i data-lucide="book-open" class="w-16 h-16 text-amber-500"></i>
+                    </div>
+                </div>
+
+                <!-- Detalhes do Produto -->
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <span class="text-amber-500 text-xs font-bold uppercase tracking-widest">Sistemas e IHC</span>
+                        <h1 class="text-3xl md:text-4xl font-serif font-bold">Princípios de IHC Aplicados</h1>
+                        <p class="text-sm text-gray-500">Edição Premium Limitada • Editora Atlas Academic</p>
+                    </div>
+
+                    <!-- Avaliações Consolidadas -->
+                    <div class="flex items-center gap-2 text-sm text-amber-500">
+                        <div class="flex"><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i></div>
+                        <span class="font-bold text-slate-900 dark:text-white">4.9</span>
+                        <span class="text-gray-400">(142 resenhas de acadêmicos)</span>
+                    </div>
+
+                    <!-- Preço e Botões Rápidos (Foco em Conversão e Baixo KLM) -->
+                    <div class="p-4 bg-gray-100 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs text-gray-400 line-through">R$ 120,00</span>
+                            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">R$ 89,90</div>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="addToCart()" class="flex-1 sm:flex-none bg-slate-800 text-white dark:bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 text-sm"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Adicionar</button>
+                            <button onclick="instantCheckout()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm shadow-md">Comprar Agora</button>
+                        </div>
+                    </div>
+
+                    <!-- Sinopse -->
+                    <div class="space-y-2">
+                        <h3 class="font-serif font-bold text-lg">Sinopse da Obra</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                            A bíblia moderna para projetistas que buscam excelência operacional em interfaces digitais. Kieras desmistifica os modelos matemáticos de comportamento cognitivo humano, permitindo calcular o tempo exato que um usuário levará para completar transações críticas no ambiente web.
+                        </p>
+                    </div>
+
+                    <!-- Ficha Técnica -->
+                    <div class="border-t border-gray-200 dark:border-gray-800 pt-4 grid grid-cols-2 gap-4 text-xs">
+                        <div><span class="text-gray-400">ISBN-13:</span> 978-3-16-148410-0</div>
+                        <div><span class="text-gray-400">Páginas:</span> 412 páginas</div>
+                        <div><span class="text-gray-400">Idioma:</span> Português (BR)</div>
+                        <div><span class="text-gray-400">Formato:</span> Capa Dura Premium</div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ==========================================================================
-             VIEW: ÁREA DO CLIENTE / FIDELIDADE
-             ========================================================================== -->
-        <section id="view-client" class="view-section">
-            <div class="section-header">
-                <h2>Painel Atlas de Conhecimento</h2>
-            </div>
-            <div style="background: var(--surface-light); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--border-light); margin-bottom: 30px;">
-                <h3>Olá, Explorador Intelectual</h3>
-                <p style="color: var(--text-muted-light);">Nível do Programa de Fidelidade: <strong>Membro Atlas Gold</strong></p>
-                <div style="background: var(--border-light); height: 8px; border-radius: 4px; margin-top: 15px; position: relative;">
-                    <div style="background: var(--secondary-gold); width: 75%; height: 100%; border-radius: 4px;"></div>
+        <!-- ================= CARRINHO DE COMPRAS ================= -->
+        <section id="view-carrinho" class="view-page hidden space-y-8">
+            <h1 class="text-2xl font-serif font-bold">Seu Tesouro Intelectual (Carrinho)</h1>
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Itens -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white dark:bg-atlas-slate p-4 rounded-xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center">
+                        <div class="w-16 h-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                        <div class="flex-1">
+                            <h3 class="font-serif font-bold text-sm">Princípios de IHC Aplicados</h3>
+                            <p class="text-xs text-gray-400">Quantidade: 1</p>
+                        </div>
+                        <span class="font-bold text-amber-500">R$ 89,90</span>
+                    </div>
                 </div>
-                <p style="font-size: 12px; margin-top: 5px; text-align: right;">Faltam 250 pontos para o próximo livro cortesia.</p>
+                <!-- Resumo e Frete -->
+                <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 h-fit space-y-6">
+                    <h3 class="font-serif font-bold text-lg">Resumo do Pedido</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span>Subtotal:</span><span class="font-medium">R$ 89,90</span></div>
+                        <div class="flex justify-between text-green-500"><span>Cupom ATLASIHC:</span><span>- R$ 10,00</span></div>
+                        <div class="flex justify-between"><span>Frete (Expresso):</span><span class="text-gray-400">Grátis</span></div>
+                        <hr class="border-gray-200 dark:border-gray-800 my-2">
+                        <div class="flex justify-between text-base font-bold"><span>Total:</span><span class="text-amber-500">R$ 79,90</span></div>
+                    </div>
+                    <button onclick="switchPage('checkout')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg text-center block text-sm transition shadow-md">Prosseguir para o Checkout</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CHECKOUT STEP-BY-STEP ================= -->
+        <section id="view-checkout" class="view-page hidden max-w-2xl mx-auto space-y-8">
+            <h1 class="text-2xl font-serif font-bold text-center">Finalização Ágil (Foco em Conversão)</h1>
+            <div class="bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 space-y-6">
+                <!-- Etapa 1: Endereço -->
+                <div>
+                    <h3 class="font-serif font-bold mb-3 flex items-center gap-2 text-sm"><span class="w-5 h-5 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-xs font-bold">1</span> Endereço de Destino</h3>
+                    <input type="text" placeholder="CEP (Autocompleta endereço)" class="w-full p-2 text-sm border rounded-lg bg-gray-50 dark:bg-slate-900 border-gray-300 dark:border-gray-700">
+                </div>
+                <!-- Etapa 2: Pagamento Simplificado -->
+                <div>
+                    <h3 class="font-serif font-bold mb-3 flex items-center gap-2 text-sm"><span class="w-5 h-5 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-xs font-bold">2</span> Método de Pagamento</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <label class="border p-3 rounded-lg flex items-center gap-2 cursor-pointer border-amber-500 bg-amber-500/5"><input type="radio" name="pay" checked> <span>Pix (Aprovação Instantânea)</span></label>
+                        <label class="border p-3 rounded-lg flex items-center gap-2 cursor-pointer border-gray-300 dark:border-gray-700"><input type="radio" name="pay"> <span>Cartão de Crédito</span></label>
+                    </div>
+                </div>
+                <button onclick="confirmOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-center block text-sm transition shadow-lg">Fechar Pedido de Forma Segura</button>
+            </div>
+        </section>
+
+        <!-- ================= ÁREA DO CLIENTE ================= -->
+        <section id="view-cliente" class="view-page hidden space-y-8">
+            <div class="flex items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-6">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-600 flex items-center justify-center text-white text-xl font-bold font-serif shadow-md">U</div>
+                <div>
+                    <h1 class="text-2xl font-serif font-bold">Bento de Espinosa</h1>
+                    <p class="text-xs text-gray-400">ID de Explorador: #10294 • Nível 3 do Programa de Fidelidade Atlas</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Seções da conta -->
+                <div class="space-y-2">
+                    <button class="w-full text-left p-3 rounded-lg bg-amber-500 text-slate-900 font-bold text-sm flex items-center justify-between"><span>Histórico de Pedidos</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    <button class="w-full text-left p-3 rounded-lg bg-white dark:bg-atlas-slate hover:bg-gray-100 text-sm flex items-center justify-between"><span>Lista de Desejos (7)</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    <button class="w-full text-left p-3 rounded-lg bg-white dark:bg-atlas-slate hover:bg-gray-100 text-sm flex items-center justify-between"><span>Pontos de Fidelidade (450 pts)</span> <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                </div>
+                <!-- Conteúdo dinâmico da seção selecionada -->
+                <div class="md:col-span-2 bg-white dark:bg-atlas-slate p-6 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
+                    <h3 class="font-serif font-bold text-base">Últimos Pedidos Cadastrados</h3>
+                    <div class="p-4 border border-gray-200 dark:border-gray-800 rounded-lg flex justify-between items-center text-xs">
+                        <div>
+                            <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">Em Rota de Entrega</span>
+                            <h4 class="font-bold mt-1 text-sm">Pedido #2941-A</h4>
+                            <p class="text-gray-400">1x Estruturas Fundamentais de Dados</p>
+                        </div>
+                        <span class="font-bold text-amber-500 text-sm">R$ 74,30</span>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- ==========================================================================
-         JAVASCRIPT / SISTEMA DE INTERAÇÃO IHC
-         ========================================================================== -->
+    <!-- FOOTER LITERÁRIO -->
+    <footer class="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-gray-800 py-12 text-center text-xs text-gray-400 space-y-4">
+        <p class="max-w-md mx-auto">"O conhecimento é um mapa para terras que ainda não cruzamos." — Livraria Atlas © 2026.</p>
+        <div class="flex justify-center gap-4 text-gray-500">
+            <a href="#" class="hover:text-amber-500">Políticas de Privacidade</a>
+            <span>•</span>
+            <a href="#" class="hover:text-amber-500">IHC Documentation</a>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC / PROTOTYPE MOTOR -->
     <script>
-        /* Banco de Dados Mockado - Itens Premium e de Tecnologia */
-        const BOOKS_DATABASE = [
-            { id: 1, title: "Arquitetura de Escolhas", author: "Richard Thaler", price: 64.90, category: "Negócios", bg: "#1E3A8A", label: "Destaque" },
-            { id: 2, title: "Sistemas Limpos e IA", author: "Robert C. Martin", price: 89.00, category: "Tecnologia", bg: "#065F46", label: "Novo" },
-            { id: 3, title: "O Império do Silêncio", author: "Christopher Ruocchio", price: 54.50, category: "Ficção", bg: "#701A75", label: "Mais Vendido" },
-            { id: 4, title: "Foco Profundo", author: "Cal Newport", price: 42.00, category: "Auto-Desenvolvimento", bg: "#991B1B", label: "Destaque" },
-            { id: 5, title: "Design da Mente Humana", author: "Don Norman", price: 78.00, category: "Tecnologia", bg: "#1E293B", label: "IHC Clássico" },
-            { id: 6, title: "O Algoritmo Mestre", author: "Pedro Domingos", price: 92.10, category: "Tecnologia", bg: "#312E81", label: "Esgotando" }
-        ];
+        // Inicialização dos ícones Lucide
+        lucide.createIcons();
 
-        let cart = [];
+        // State do protótipo
+        let cartItemsCount = 0;
 
-        /* SPA Navigation Engine - Otimizado para KLM (Troca instantânea de estado de visualização) */
-        function navigate(viewId) {
-            document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            
-            const targetView = document.getElementById(`view-${viewId}`);
-            if(targetView) targetView.classList.add('active');
-            
-            const activeNav = document.getElementById(`nav-${viewId}`);
-            if(activeNav) activeNav.classList.add('active');
-
-            window.scrollTo({ top: 0, behavior: 'instant' });
-        }
-
-        /* Renderizadores de Componentes */
-        function renderGrids() {
-            const featuredContainer = document.getElementById('featured-books');
-            const bestsellerContainer = document.getElementById('bestseller-books');
-            const catalogContainer = document.getElementById('catalog-books');
-
-            if(!featuredContainer) return;
-
-            featuredContainer.innerHTML = BOOKS_DATABASE.slice(0, 3).map(book => generateCard(book)).join('');
-            bestsellerContainer.innerHTML = BOOKS_DATABASE.slice(3, 6).map(book => generateCard(book)).join('');
-            catalogContainer.innerHTML = BOOKS_DATABASE.map(book => generateCard(book)).join('');
-        }
-
-        function generateCard(book) {
-            return `
-                <div class="product-card" onclick="openProduct(${book.id})">
-                    <div class="book-cover-wrapper" style="background-color: ${book.bg}; color: #ffffff;">
-                        ${book.label ? `<span class="tag-promo">${book.label}</span>` : ''}
-                        <span>${book.title}</span>
-                    </div>
-                    <div class="product-title">${book.title}</div>
-                    <div class="product-author">${book.author}</div>
-                    <div class="product-price-row">
-                        <span class="price">R$ ${book.price.toFixed(2)}</span>
-                        <button class="add-fast-btn" onclick="event.stopPropagation(); addToCart(${book.id})" title="Adição em 1-clique (Meta KLM)">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        /* Página de Produto Dinâmica */
-        function openProduct(id) {
-            const book = BOOKS_DATABASE.find(b => b.id === id);
-            const container = document.getElementById('product-detail-content');
-            
-            container.innerHTML = `
-                <div class="detail-cover" style="background-color: ${book.bg}; color: white;">
-                    ${book.title}
-                </div>
-                <div class="detail-info">
-                    <span style="color: var(--secondary-gold); font-weight:700; font-size:12px; uppercase">${book.category}</span>
-                    <h1>${book.title}</h1>
-                    <div class="detail-meta">Escrito por <strong>${book.author}</strong> | Editora Atlas Publishing</div>
-                    <div class="detail-price">R$ ${book.price.toFixed(2)}</div>
-                    <p class="detail-synopsis">
-                        Esta obra é uma das principais referências no ecossistema intelectual contemporâneo. Através de dados empíricos e uma narrativa envolvente, o autor expande nossas fronteiras de compreensão sobre o tema, sendo leitura obrigatória para acadêmicos e profissionais de alto desempenho.
-                    </p>
-                    <div class="action-group-p">
-                        <button class="btn-premium btn-primary" onclick="addToCart(${book.id}); navigate('cart')">Comprar Agora (1-Click)</button>
-                        <button class="btn-premium btn-secondary" onclick="addToCart(${book.id})">Adicionar à Bag</button>
-                    </div>
-                </div>
-            `;
-            navigate('product');
-        }
-
-        /* Sistema de Gerenciamento do Carrinho (IHC State Machine) */
-        function addToCart(id) {
-            const book = BOOKS_DATABASE.find(b => b.id === id);
-            cart.push(book);
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-counter').innerText = cart.length;
-            const container = document.getElementById('cart-items-container');
-            
-            if(cart.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted-light); padding: 20px;">Seu carrinho está vazio no momento.</p>`;
-                return;
+        // Função de navegação entre visões (SPA Model)
+        function switchPage(pageId) {
+            document.querySelectorAll('.view-page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            const activePage = document.getElementById(`view-${pageId}`);
+            if (activePage) {
+                activePage.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-
-            container.innerHTML = cart.map((item, index) => `
-                <div class="cart-item">
-                    <div>
-                        <strong style="color: var(--text-light);">${item.title}</strong>
-                        <div style="font-size:12px; color: var(--text-muted-light);">${item.author}</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        <span class="price">R$ ${item.price.toFixed(2)}</span>
-                        <button class="action-btn" style="color: #EF4444;" onclick="removeFromCart(${index})"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                </div>
-            `).join('');
-
-            const subtotal = cart.reduce((acc, item) => acc + item.price, 0);
-            document.getElementById('summary-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
-            document.getElementById('summary-total').innerText = `R$ ${(subtotal + 12).toFixed(2)}`;
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
+        // Simulação de carrinho para feedback imediato (Baixo tempo de preparação mental)
+        function addToCart() {
+            cartItemsCount++;
+            document.getElementById('cart-count').innerText = cartItemsCount;
+            alert('Item adicionado ao carrinho! Operador KLM validado com sucesso.');
         }
 
-        /* Feedback de Erro/Sucesso e KLM Optimization */
-        function processOrder() {
-            alert("Ordem efetuada com sucesso! O operador de tempo de resposta do sistema foi mapeado em 0.1s para evitar gargalos mentais do usuário.");
-            cart = [];
-            updateCartUI();
-            navigate('home');
+        function instantCheckout() {
+            switchPage('checkout');
         }
 
-        /* Busca preditiva simples por teclado */
-        function handleSearch(e) {
-            if(e.key === 'Enter') triggerSearch();
+        function confirmOrder() {
+            alert('Pedido Concluído! Protótipo de IHC processou a rota final.');
+            cartItemsCount = 0;
+            document.getElementById('cart-count').innerText = cartItemsCount;
+            switchPage('home');
         }
 
-        function triggerSearch() {
-            navigate('catalog');
-        }
-
-        /* Motor de gerenciamento de Tema Visual */
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const icon = document.getElementById('theme-icon');
-            
-            if(currentTheme === 'light') {
-                body.setAttribute('data-theme', 'dark');
-                icon.className = "fa-solid fa-sun";
+        // Alternador de Modo Escuro / Claro
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
             } else {
-                body.setAttribute('data-theme', 'light');
-                icon.className = "fa-solid fa-moon";
+                html.classList.remove('light');
+                html.classList.add('dark');
             }
         }
 
-        // Inicialização do Protótipo
-        window.onload = () => {
-            renderGrids();
-            updateCartUI();
-        };
+        // ACESSIBILIDADE E MAPEAMENTO DE ATALHOS KLM (Teclas de Função para evitar chaveamento de contexto H)
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'F1') { e.preventDefault(); switchPage('home'); }
+            if (e.key === 'F2') { e.preventDefault(); switchPage('categoria'); }
+            if (e.key === 'F3') { e.preventDefault(); switchPage('produto'); }
+            if (e.key === 'F4') { e.preventDefault(); switchPage('carrinho'); }
+            if (e.key === 'F5') { e.preventDefault(); switchPage('checkout'); }
+            if (e.key === 'F6') { e.preventDefault(); switchPage('cliente'); }
+            
+            // Atalho de foco na busca '/' para mitigar uso de mouse (Operador P)
+            if (e.key === '/') {
+                const searchInput = document.getElementById('global-search');
+                if (document.activeElement !== searchInput) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            }
+        });
     </script>
 </body>
 </html>
